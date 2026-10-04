@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0b6b5c"><link rel="manifest" href="manifest.json"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png"><title>Pharmacy Management</title><style>body{margin:0;padding:10px;background:#fff}</style></head><body>
+<div id="ph"><style>
+#ph{font:15px/1.4 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;max-width:720px;margin:0 auto;color:#14302b}
+#ph *{box-sizing:border-box}
+#ph .hd{background:#0b6b5c;color:#fff;padding:12px 14px;border-radius:12px;font-size:18px;font-weight:700}
+#ph .hd small{display:block;font-weight:400;font-size:12px;opacity:.85}
+#ph nav{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:10px 0}
+#ph nav button{padding:9px 4px;border:1px solid #bcd3ce;background:#fff;border-radius:9px;font-size:13px;color:#14302b}
+#ph nav button.on{background:#0b6b5c;color:#fff;border-color:#0b6b5c}
+#ph input,#ph select{width:100%;padding:10px;border:1px solid #bcd3ce;border-radius:8px;margin:2px 0 6px;font-size:15px;background:#fff}
+#ph label{font-size:12px;color:#4d6761;display:block}
+#ph button.b{background:#0b6b5c;color:#fff;border:0;padding:10px 16px;border-radius:8px;font-size:15px;margin:4px 4px 4px 0}
+#ph button.s{background:#e6f0ee;color:#14302b;border:0;padding:7px 10px;border-radius:7px;margin-left:4px}
+#ph button.d{background:#fbe9e7;color:#b3261e}
+#ph h3{margin:16px 0 6px;font-size:16px}
+#ph .g{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#ph .c{background:#eef5f3;border-radius:10px;padding:10px}
+#ph .c b{display:block;font-size:19px}
+#ph .r{display:flex;justify-content:space-between;align-items:center;gap:8px;border-bottom:1px solid #dde9e6;padding:8px 0}
+#ph .r small{color:#4d6761}
+#ph .red{color:#b3261e}#ph .amb{color:#a15c00}
+#ph table{width:100%;border-collapse:collapse;font-size:13px}
+#ph td,#ph th{padding:5px;border-bottom:1px solid #dde9e6;text-align:left}
+#ph .tot{font-size:20px;font-weight:700;margin:6px 0}
+#ph .rc{position:fixed;inset:0;background:#fff;z-index:99999;overflow:auto;padding:16px;font-size:14px}
+#ph .lock{max-width:280px;margin:60px auto;text-align:center}
+#ph #u_sg,#ph #m_sg{max-height:260px;overflow:auto}
+@media print{body *{visibility:hidden}#ph .rc,#ph .rc *{visibility:visible}#ph .rc{position:absolute;left:0;top:0;width:100%}#ph .np{display:none}}
+</style><div id="ph-app"></div><div id="ph-rc"></div>
+<script>
+(function(){
+var K='pharmaV1',$=function(i){return document.getElementById(i)},D,cart=[],tab='dash',ed=null,ok=false,pimg=null,lastAg='';
+try{D=JSON.parse(localStorage.getItem(K))}catch(e){}
+D=D||{meds:[],sales:[],purch:[],custs:[],sups:[],set:{name:'My Pharmacy',addr:'',phone:'',pin:'1234',foot:'Thank you. Get well soon!'}};
+var CAT="Panadol 500mg Tab|Paracetamol|GSK;Panadol Extra Tab|Paracetamol + Caffeine|GSK;Panadol CF Tab|Paracetamol + Pseudoephedrine + Chlorpheniramine|GSK;Calpol Syrup|Paracetamol|GSK;Calpol 6 Plus Susp|Paracetamol|GSK;Augmentin 625mg Tab|Amoxicillin + Clavulanic acid|GSK;Augmentin 1g Tab|Amoxicillin + Clavulanic acid|GSK;Augmentin Susp|Amoxicillin + Clavulanic acid|GSK;Amoxil 500mg Cap|Amoxicillin|GSK;Septran DS Tab|Co-trimoxazole|GSK;Velosef 500mg Cap|Cephradine|;Ventolin Inhaler|Salbutamol|GSK;Ventolin Syrup|Salbutamol|GSK;Zyrtec 10mg Tab|Cetirizine|GSK;Actifed Syrup|Triprolidine + Pseudoephedrine|GSK;Betnovate Cream|Betamethasone|GSK;Betnovate-N Cream|Betamethasone + Neomycin|GSK;Dermovate Cream|Clobetasol|GSK;Bactroban Ointment|Mupirocin|GSK;Zovirax Cream|Acyclovir|GSK;Brufen 400mg Tab|Ibuprofen|Abbott;Brufen Susp|Ibuprofen|Abbott;Arinac Tab|Ibuprofen + Pseudoephedrine|Abbott;Surbex-Z Tab|Multivitamin + Zinc|Abbott;Klaricid 500mg Tab|Clarithromycin|Abbott;Duphalac Syrup|Lactulose|Abbott;Duphaston Tab|Dydrogesterone|Abbott;Ponstan Forte Tab|Mefenamic acid|Pfizer;Norvasc 5mg Tab|Amlodipine|Pfizer;Lipitor 20mg Tab|Atorvastatin|Pfizer;Zithromax 500mg Tab|Azithromycin|Pfizer;Zithromax Susp|Azithromycin|Pfizer;Lyrica 75mg Cap|Pregabalin|Pfizer;Celebrex 200mg Cap|Celecoxib|Pfizer;Caltrate Tab|Calcium + Vitamin D|Pfizer;Centrum Tab|Multivitamin + Minerals|Pfizer;Flagyl 400mg Tab|Metronidazole|Sanofi;Flagyl Susp|Metronidazole|Sanofi;Amaryl 2mg Tab|Glimepiride|Sanofi;Daonil 5mg Tab|Glibenclamide|Sanofi;Plavix 75mg Tab|Clopidogrel|Sanofi;Lasix 40mg Tab|Furosemide|Sanofi;Avil Tab|Pheniramine|Sanofi;Avil Inj|Pheniramine|Sanofi;Telfast 120mg Tab|Fexofenadine|Sanofi;Telfast 180mg Tab|Fexofenadine|Sanofi;Tavanic 500mg Tab|Levofloxacin|Sanofi;Voltral 50mg Tab|Diclofenac|Novartis;Cataflam 50mg Tab|Diclofenac potassium|Novartis;Voltaren Emulgel|Diclofenac gel|;Diovan 80mg Tab|Valsartan|Novartis;Galvus 50mg Tab|Vildagliptin|Novartis;Tegretol 200mg Tab|Carbamazepine|Novartis;Calcium-Sandoz Tab|Calcium|Novartis;Glucophage 500mg Tab|Metformin|Merck;Glucophage 850mg Tab|Metformin|Merck;Concor 5mg Tab|Bisoprolol|Merck;Euthyrox 50mcg Tab|Levothyroxine|Merck;Neurobion Tab|Vitamin B1 + B6 + B12|Merck;Neurobion Inj|Vitamin B1 + B6 + B12|Merck;Januvia 100mg Tab|Sitagliptin|MSD;Singulair 10mg Tab|Montelukast|MSD;Cozaar 50mg Tab|Losartan|MSD;Arcoxia 90mg Tab|Etoricoxib|MSD;Crestor 10mg Tab|Rosuvastatin|AstraZeneca;Tenormin 50mg Tab|Atenolol|AstraZeneca;Zestril 10mg Tab|Lisinopril|AstraZeneca;Risek 20mg Cap|Omeprazole|Getz;Risek 40mg Cap|Omeprazole|Getz;Risek Insta Sachet|Omeprazole + Sodium bicarbonate|Getz;Getryl 2mg Tab|Glimepiride|Getz;Nexum 20mg Cap|Esomeprazole|Hilton;Nexum 40mg Cap|Esomeprazole|Hilton;Novidat 500mg Tab|Ciprofloxacin|Sami;Ciproxin 500mg Tab|Ciprofloxacin|Bayer;Clarityn 10mg Tab|Loratadine|Bayer;Canesten Cream|Clotrimazole|Bayer;Aspirin 100mg Tab|Aspirin|Bayer;Disprin Tab|Aspirin (soluble)|Reckitt;Gaviscon Liquid|Alginate + Antacid|Reckitt;Strepsils Lozenges|Amylmetacresol + Dichlorobenzyl alcohol|Reckitt;Controloc 40mg Tab|Pantoprazole|Takeda;Motilium 10mg Tab|Domperidone|Janssen;Imodium Cap|Loperamide|Janssen;Daktarin Cream|Miconazole|Janssen;Buscopan Tab|Hyoscine butylbromide|;Benadryl Syrup|Diphenhydramine|;Ascoril Expectorant|Salbutamol + Bromhexine + Guaifenesin|Glenmark;Tobrex Eye Drops|Tobramycin|Alcon;Ciloxan Eye Drops|Ciprofloxacin|Alcon;Maxitrol Eye Drops|Neomycin + Polymyxin B + Dexamethasone|Alcon;Betadine Solution|Povidone iodine|Mundipharma;Fucidin Cream|Fusidic acid|Leo;ORS Sachet|Oral rehydration salts|;Normal Saline 500ml|Sodium chloride|;Dextrose 5% 500ml|Dextrose|;Folic Acid 5mg Tab|Folic acid|;Vitamin C 500mg Tab|Ascorbic acid|;Zinc Syrup|Zinc sulphate|;Cetirizine 10mg Tab|Cetirizine|;Metformin 500mg Tab|Metformin|;Amlodipine 5mg Tab|Amlodipine|;Omeprazole 20mg Cap|Omeprazole|;Paracetamol 500mg Tab|Paracetamol|;Ibuprofen 400mg Tab|Ibuprofen|";
+var CATARR=CAT.split(';');
+function CA(){return CATARR.concat(D.cx)}
+function cs(q,skip){return CA().map(function(r,i){return [r.split('|'),i]}).filter(function(z){return (!skip||!skip[z[0][0].toLowerCase()])&&(z[0][0]+' '+(z[0][1]||'')).toLowerCase().indexOf(q)>-1}).sort(function(a,b){return (b[0][0].toLowerCase().indexOf(q)===0)-(a[0][0].toLowerCase().indexOf(q)===0)}).slice(0,40)}
+function norm(){D.cx=D.cx||[];D.agents=D.agents||[];D.set.tiers=D.set.tiers||[]}norm();
+function save(){try{localStorage.setItem(K,JSON.stringify(D))}catch(e){alert('Could not save: browser storage is blocked or full.')}}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,5)}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function m(n){return 'Rs '+Number(n||0).toLocaleString(undefined,{maximumFractionDigits:2})}
+function today(){return new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10)}
+function sum(a,f){return a.reduce(function(x,y){return x+f(y)},0)}
+function days(exp){return exp?Math.floor((new Date(exp)-new Date(today()))/864e5):9999}
+function f(i,l,t,v){return '<label>'+l+'</label><input id="'+i+'" type="'+(t||'text')+'" value="'+esc(v)+'"'+(t==='number'?' inputmode="decimal" step="any"':'')+'>'}
+function num(i){return parseFloat($(i).value)||0}
+function val(i){return $(i).value.trim()}
+function th(x){return x.img?'<img src="'+x.img+'" style="width:44px;height:44px;object-fit:cover;border-radius:6px">':''}
+function find(id){return D.meds.filter(function(x){return x.id===id})[0]}
+function alerts(){var a={exp:[],soon:[],low:[]};D.meds.forEach(function(x){var d=days(x.exp);if(d<0)a.exp.push(x);else if(d<=60)a.soon.push(x);if(x.min>0&&x.qty<=x.min)a.low.push(x)});return a}
+function bal(k,x){if(k==='custs')return sum(D.sales.filter(function(s){return s.cust===x.id}),function(s){return s.total-s.paid})-(x.rec||0);
+return sum(D.purch.filter(function(p){return p.sup===x.name}),function(p){return p.qty*p.cost-p.paid})-(x.rec||0)}
+function inc(t){var T=D.set.tiers.slice().sort(function(a,b){return b.min-a.min}),x=T.filter(function(z){return t>=z.min})[0];return x?{x:x,amt:t*x.pct/100+(x.bonus||0)}:{x:null,amt:0}}
+function agentTab(a,b){var rows='',gt=0;D.agents.forEach(function(g){var dy={},tot=0,it=0;D.sales.forEach(function(s){if(s.agent===g.id&&s.date>=a&&s.date<=b)dy[s.date]=(dy[s.date]||0)+s.total});
+Object.keys(dy).sort().forEach(function(k){var r=inc(dy[k]);tot+=dy[k];it+=r.amt;rows+='<tr><td>'+esc(g.name)+'</td><td>'+k+'</td><td>'+m(dy[k])+'</td><td>'+(r.x?r.x.pct+'%'+(r.x.bonus?' + '+m(r.x.bonus):''):'-')+'</td><td>'+m(r.amt)+'</td></tr>'});
+if(tot)rows+='<tr><td colspan="2"><b>'+esc(g.name)+' total</b></td><td><b>'+m(tot)+'</b></td><td></td><td><b>'+m(it)+'</b></td></tr>';gt+=it});
+return '<table><tr><th>Agent</th><th>Date</th><th>Sales</th><th>Rate</th><th>Incentive</th></tr>'+(rows||'<tr><td colspan="5">No agent sales in this period.</td></tr>')+'</table><p><b>Total incentive: '+m(gt)+'</b></p>'}
+var rf=today().slice(0,8)+'01',rt=today();
+var TABS=[['dash','🏠 Home'],['pos','🧾 Sale'],['meds','💊 Stock'],['pur','📦 Buy'],['alr','⚠️ Alerts'],['custs','👥 Customers'],['sups','🏢 Suppliers'],['agents','🧑‍💼 Agents'],['rep','📊 Reports'],['set','⚙️ Settings']];
+var V={};
+V.dash=function(){var t=today(),ss=D.sales.filter(function(s){return s.date===t}),ps=D.purch.filter(function(p){return p.date===t}),a=alerts();
+function c(l,v,cl){return '<div class="c"><small>'+l+'</small><b class="'+(cl||'')+'">'+v+'</b></div>'}
+return '<div class="g">'+c("Today's sales",m(sum(ss,function(s){return s.total})))+c("Today's profit",m(sum(ss,function(s){return s.profit})))+c("Today's purchases",m(sum(ps,function(p){return p.qty*p.cost})))+c('Units in stock',sum(D.meds,function(x){return x.qty}))+c('Low stock',a.low.length,a.low.length?'amb':'')+c('Expired',a.exp.length,a.exp.length?'red':'')+'</div>'+(D.meds.length?'':'<p>No medicines yet. Open <b>Stock</b> to add your first one.</p>')};
+V.meds=function(){var e=ed||{};
+return '<h3>'+(ed?'Edit':'Add')+' medicine</h3>'+'<button class="b" onclick="PH.scanStock()">📷 Scan product barcode</button>'+'<label>Medicine name (type to search the catalog)</label><input id="m_name" autocomplete="off" value="'+esc(e.name)+'" oninput="PH.sm()"><div id="m_sg"></div>'+'<label>Barcode (scan or type)</label><div style="display:flex;gap:6px"><input id="m_bar" value="'+esc(e.bar)+'"><button class="s" onclick="PH.scanTo(\'m_bar\')">📷</button></div><label>Product photo (take or choose)</label><input id="m_img" type="file" accept="image/*" capture="environment" onchange="PH.photo(this)"><div id="m_pv">'+(pimg?'<img src="'+pimg+'" style="height:70px;border-radius:8px">':'')+'</div>'+f('m_gen','Generic name','text',e.gen)+f('m_co','Company','text',e.co)+f('m_batch','Batch number','text',e.batch)+f('m_exp','Expiry date','date',e.exp)+f('m_cost','Purchase price','number',e.cost)+f('m_price','Sale price','number',e.price)+f('m_qty','Quantity','number',e.qty)+f('m_min','Minimum stock','number',e.min)+f('m_sup','Supplier','text',e.sup)+'<button class="b" onclick="PH.saveMed()">Save medicine</button>'+(ed?'<button class="s" onclick="PH.cancel()">Cancel</button>':'')+'<h3>Medicines</h3><input id="phq" placeholder="Search by name or generic" oninput="PH.list()"><div id="ml"></div>'};
+V.pos=function(){var ao=D.agents.map(function(a){return '<option value="'+a.id+'"'+(a.id===lastAg?' selected':'')+'>'+esc(a.name)+'</option>'}).join('');var o=D.custs.map(function(c){return '<option value="'+c.id+'">'+esc(c.name)+'</option>'}).join('');
+return '<div style="display:flex;gap:6px"><input id="ps" placeholder="🔎 Search or scan barcode" oninput="PH.ps()"><button class="b" style="margin:2px 0 6px" onclick="PH.scanSale()">📷</button></div><div id="pr"></div><h3>Cart</h3><div id="ci"></div><label>Discount (Rs)</label><input id="pd" type="number" inputmode="decimal" oninput="PH.tot()"><label>Sold by (agent)</label><select id="pa"><option value="">No agent</option>'+ao+'</select><label>Customer (optional, needed for credit)</label><select id="pc"><option value="">Walk-in</option>'+o+'</select><label>Cash received (blank = exact)</label><input id="pp" type="number" inputmode="decimal" oninput="PH.tot()"><div class="tot" id="tt"></div><div id="ch"></div><button class="b" onclick="PH.sell()">Complete sale</button><button class="s" onclick="PH.clr()">Clear</button>'};
+V.pur=function(){var o=D.meds.map(function(x){return '<option value="'+x.id+'">'+esc(x.name)+' ('+x.qty+')</option>'}).join('');
+var dl=D.sups.map(function(s){return '<option value="'+esc(s.name)+'">'}).join('');
+var L=D.purch.slice(-20).reverse().map(function(p){return '<div class="r"><div><b>'+esc(p.med)+'</b> × '+p.qty+'<br><small>'+p.date+' · '+esc(p.sup)+' · Inv '+esc(p.inv)+'</small></div><div>'+m(p.qty*p.cost)+'</div></div>'}).join('');
+return '<h3>New purchase</h3><label>Supplier</label><input id="u_sup" list="u_dl"><datalist id="u_dl">'+dl+'</datalist>'+f('u_inv','Invoice number')+'<label>Medicine (type brand or generic name)</label><div style="display:flex;gap:6px"><input id="u_f" placeholder="e.g. panadol" autocomplete="off" oninput="PH.sg()"><button class="s" style="margin:2px 0 6px" onclick="PH.scanBuy()">📷</button></div><div id="u_sg"></div><div id="u_sel"></div><input id="u_med" type="hidden">'+f('u_qty','Quantity','number')+f('u_cost','Purchase price (each)','number')+f('u_price','Sale price (each)','number')+f('u_batch','Batch number')+f('u_exp','Expiry date','date')+f('u_paid','Amount paid (blank = full)','number')+'<button class="b" onclick="PH.buy()">Save purchase</button><h3>Recent purchases</h3>'+(L||'<p>No purchases yet.</p>')};
+V.alr=function(){var a=alerts();function L(t,arr,cl){return '<h3 class="'+cl+'">'+t+' ('+arr.length+')</h3>'+(arr.map(function(x){return '<div class="r"><div><b>'+esc(x.name)+'</b><br><small>Batch '+esc(x.batch)+' · Exp '+esc(x.exp)+'</small></div><div>Qty '+x.qty+'</div></div>'}).join('')||'<small>None</small>')}
+return L('Expired',a.exp,'red')+L('Expiring within 60 days',a.soon,'amb')+L('Low stock',a.low,'amb')};
+function party(k){var one=k==='custs'?'customer':'supplier';
+var L=D[k].map(function(x){var b=bal(k,x);return '<div class="r"><div><b>'+esc(x.name)+'</b><br><small>'+esc(x.phone)+' · '+(k==='custs'?D.sales.filter(function(s){return s.cust===x.id}).length+' sales':D.purch.filter(function(p){return p.sup===x.name}).length+' purchases')+'</small></div><div class="'+(b>0?'red':'')+'">'+m(b)+(b>0?'<br><button class="s" onclick="PH.settle(\''+k+'\',\''+x.id+'\')">'+(k==='custs'?'Receive':'Pay')+'</button>':'')+'</div></div>'}).join('');
+return '<h3>Add '+one+'</h3>'+f('p_name','Name')+f('p_phone','Phone','tel')+'<button class="b" onclick="PH.addParty(\''+k+'\')">Save</button><h3>'+(k==='custs'?'Customers (balance owed to you)':'Suppliers (balance you owe)')+'</h3>'+(L||'<small>None yet.</small>')}
+V.agents=function(){var T=D.set.tiers.slice().sort(function(a,b){return a.min-b.min}).map(function(t){return '<div class="r"><div>Daily sales of '+m(t.min)+' or more: <b>'+t.pct+'%</b>'+(t.bonus?' + '+m(t.bonus)+' bonus':'')+'</div><button class="s d" onclick="PH.delTier('+D.set.tiers.indexOf(t)+')">✕</button></div>'}).join('');
+var L=D.agents.map(function(g){return '<div class="r"><div><b>'+esc(g.name)+'</b><br><small>'+esc(g.phone)+'</small></div><button class="s d" onclick="PH.delAgent(\''+g.id+'\')">Delete</button></div>'}).join('');
+return '<h3>Incentive rules</h3><small>The best matching rule applies to each agent\'s total sales for the day (after discounts).</small>'+(T||'<div><small>No rules yet.</small></div>')+f('t_min','Daily sales target (Rs)','number')+f('t_pct','Incentive % of that day\'s sales','number')+f('t_bonus','Fixed bonus (Rs, optional)','number')+'<button class="b" onclick="PH.addTier()">Add rule</button><h3>Add agent</h3>'+f('p_name','Name')+f('p_phone','Phone','tel')+'<button class="b" onclick="PH.addAgent()">Save agent</button><h3>Agents</h3>'+(L||'<small>No agents yet.</small>')+'<h3>Today\'s incentives</h3>'+agentTab(today(),today())+'<small>Choose the agent on the Sale screen. See other dates under Reports.</small>'};
+V.custs=function(){return party('custs')};V.sups=function(){return party('sups')};
+V.rep=function(){var ss=D.sales.filter(function(s){return s.date>=rf&&s.date<=rt}),ps=D.purch.filter(function(p){return p.date>=rf&&p.date<=rt}),dy={};
+ss.forEach(function(s){var d=dy[s.date]=dy[s.date]||{n:0,t:0,p:0};d.n++;d.t+=s.total;d.p+=s.profit});
+var rows=Object.keys(dy).sort().map(function(k){return '<tr><td>'+k+'</td><td>'+dy[k].n+'</td><td>'+m(dy[k].t)+'</td><td>'+m(dy[k].p)+'</td></tr>'}).join('');
+return '<h3>Report period</h3><div class="g"><div>'+f('r1','From','date',rf)+'</div><div>'+f('r2','To','date',rt)+'</div></div><button class="b" onclick="PH.rep()">Show</button><button class="s" onclick="PH.rng(0)">Today</button><button class="s" onclick="PH.rng(1)">This month</button><div class="g" style="margin-top:10px"><div class="c"><small>Sales</small><b>'+m(sum(ss,function(s){return s.total}))+'</b></div><div class="c"><small>Profit</small><b>'+m(sum(ss,function(s){return s.profit}))+'</b></div><div class="c"><small>Purchases</small><b>'+m(sum(ps,function(p){return p.qty*p.cost}))+'</b></div><div class="c"><small>Stock value (cost / retail)</small><b style="font-size:14px">'+m(sum(D.meds,function(x){return x.qty*x.cost}))+' / '+m(sum(D.meds,function(x){return x.qty*x.price}))+'</b></div></div><h3>Daily sales</h3><table><tr><th>Date</th><th>Bills</th><th>Sales</th><th>Profit</th></tr>'+(rows||'<tr><td colspan="4">No sales in this period.</td></tr>')+'</table><h3>Agent incentives</h3>'+agentTab(rf,rt)};
+V.set=function(){var s=D.set;return f('s_name','Pharmacy name','text',s.name)+f('s_addr','Address','text',s.addr)+f('s_phone','Phone','text',s.phone)+f('s_foot','Receipt footer','text',s.foot)+f('s_pin','Login PIN (blank = no PIN)','text',s.pin)+'<button class="b" onclick="PH.saveSet()">Save settings</button><h3>Backup</h3><button class="b" onclick="PH.bk()">Download backup (JSON)</button><button class="b" onclick="PH.csv()">Export stock (CSV)</button><h3>Medicine search list</h3><small>'+(CATARR.length+D.cx.length)+' medicines searchable ('+D.cx.length+' imported). Import a CSV or TXT file with one medicine per line: brand, generic, company.</small><input type="file" accept=".csv,.txt" onchange="PH.imp(this)"><button class="s d" onclick="PH.clrCx()">Clear imported list</button><label>Restore from backup file</label><input type="file" accept=".json" onchange="PH.rs(this)"><h3>Danger zone</h3><button class="s d" onclick="PH.reset()">Erase all data</button>'};
+function render(){var A=$('ph-app');
+if(D.set.pin&&!ok){A.innerHTML='<div class="lock"><h2>'+esc(D.set.name)+'</h2><input id="pin" type="password" inputmode="numeric" placeholder="Enter PIN"><button class="b" onclick="PH.login()">Unlock</button></div>';return}
+A.innerHTML='<div class="hd">'+esc(D.set.name)+'<small>Pharmacy Management</small></div><nav>'+TABS.map(function(t){return '<button class="'+(t[0]===tab?'on':'')+'" onclick="PH.go(\''+t[0]+'\')">'+t[1]+'</button>'}).join('')+'</nav><div>'+V[tab]()+'</div>';
+if(tab==='meds')PH.list();if(tab==='pos'){PH.ps();PH.cart()}}
+function dl(n,t,ty){var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:ty}));a.download=n;document.body.appendChild(a);a.click();a.remove()}
+window.PH={
+scan:function(cb){
+if(!window.BarcodeDetector){alert('This browser cannot read barcodes. Type the barcode, or use a USB/Bluetooth scanner (it types into the box).');return}
+if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){PH.snap(cb);return}
+var bd=new BarcodeDetector(),st,run=true,v=document.createElement('video'),o=document.createElement('div'),b=document.createElement('button');
+function stop(){run=false;if(st)st.getTracks().forEach(function(t){t.stop()});o.remove()}
+o.className='rc';o.style.background='#000';o.innerHTML='<p style="color:#fff;text-align:center">Point the camera at the barcode</p>';
+b.className='b';b.textContent='Cancel';b.onclick=stop;v.setAttribute('playsinline','');v.style.cssText='width:100%;max-height:70vh';
+o.appendChild(v);o.appendChild(b);$('ph').appendChild(o);
+navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}}).then(function(s){st=s;v.srcObject=s;v.play();
+(function tick(){if(!run)return;bd.detect(v).then(function(r){if(r.length){var c=r[0].rawValue;stop();cb(c)}else setTimeout(tick,250)}).catch(function(){setTimeout(tick,250)})})()}).catch(function(){stop();PH.snap(cb)})},
+snap:function(cb){var i=document.createElement('input');i.type='file';i.accept='image/*';i.setAttribute('capture','environment');i.onchange=function(){var fl=i.files[0];if(!fl)return;createImageBitmap(fl).then(function(bm){return new BarcodeDetector().detect(bm)}).then(function(r){if(r.length)cb(r[0].rawValue);else alert('No barcode found. Retake the photo closer and in good light, or type the barcode.')}).catch(function(){alert('Could not read the photo. Type the barcode instead.')})};i.click()},
+scanTo:function(id){PH.scan(function(c){$(id).value=c})},
+scanStock:function(){PH.scan(function(c){var x=D.meds.filter(function(z){return z.bar===c})[0];ed=x||null;pimg=x?x.img||null:null;render();if(!x)$('m_bar').value=c;window.scrollTo(0,0)})},
+scanSale:function(){PH.scan(function(c){PH.byBar(c)})},
+scanBuy:function(){PH.scan(function(c){var x=D.meds.filter(function(z){return z.bar===c})[0];if(x)PH.pickBuy(x.id);else alert('No medicine with this barcode. Add it in Stock first.')})},
+byBar:function(c){var x=D.meds.filter(function(z){return z.bar===c})[0];if(!x){alert('No medicine with this barcode. Add it in Stock first.');return}
+if(x.qty<=0||days(x.exp)<0){alert(x.name+' is out of stock or expired.');$('ps').value='';return}PH.add(x.id)},
+photo:function(el){var fl=el.files[0];if(!fl)return;var r=new FileReader();r.onload=function(){var im=new Image();im.onload=function(){var k=Math.min(1,240/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=im.width*k;c.height=im.height*k;c.getContext('2d').drawImage(im,0,0,c.width,c.height);pimg=c.toDataURL('image/jpeg',.6);$('m_pv').innerHTML='<img src="'+pimg+'" style="height:70px;border-radius:8px">'};im.src=r.result};r.readAsDataURL(fl)},
+addAgent:function(){if(!val('p_name')){alert('Enter a name');return}D.agents.push({id:uid(),name:val('p_name'),phone:val('p_phone')});save();render()},
+delAgent:function(i){if(confirm('Delete this agent? Their past sales stay but are no longer counted in incentive reports.')){D.agents=D.agents.filter(function(g){return g.id!==i});save();render()}},
+addTier:function(){var a=num('t_min'),p=num('t_pct'),b=num('t_bonus');if(a<=0||(p<=0&&b<=0)){alert('Enter a sales target and a percentage or bonus.');return}D.set.tiers.push({min:a,pct:p,bonus:b});save();render()},
+delTier:function(i){D.set.tiers.splice(i,1);save();render()},
+cat:function(){var have={};D.meds.forEach(function(x){have[x.name.toLowerCase()]=1});var n=0;CAT.split(';').forEach(function(r){var p=r.split('|');if(!p[0]||have[p[0].toLowerCase()])return;D.meds.push({id:uid(),name:p[0],gen:p[1]||'',co:p[2]||'',batch:'',exp:'',cost:0,price:0,qty:0,min:0,sup:'',bar:'',img:null});n++});save();alert(n+' medicines added with price 0 and quantity 0. Open Stock, tap Edit on each, and set your prices.');render()},
+fm:function(q){q=q.toLowerCase();$('u_med').innerHTML=D.meds.filter(function(x){return (x.name+' '+x.gen).toLowerCase().indexOf(q)>-1}).map(function(x){return '<option value="'+x.id+'">'+esc(x.name)+' ('+x.qty+')</option>'}).join('')},
+sg:function(){var q=$('u_f').value.trim().toLowerCase(),o=$('u_sg');if(!q){o.innerHTML='';return}
+var have={},h=D.meds.filter(function(x){return (x.name+' '+x.gen).toLowerCase().indexOf(q)>-1}).slice(0,15).map(function(x){return '<div class="r" onclick="PH.pickBuy(\''+x.id+'\')"><div><b>'+esc(x.name)+'</b><br><small>'+esc(x.gen)+' · '+esc(x.co)+' · stock '+x.qty+'</small></div><div>Select</div></div>'}).join('');
+D.meds.forEach(function(x){have[x.name.toLowerCase()]=1});
+h+=cs(q,have).map(function(z){return '<div class="r" onclick="PH.pickCat('+z[1]+')"><div><b>'+esc(z[0][0])+'</b><br><small>'+esc(z[0][1])+' · '+esc(z[0][2])+' · new</small></div><div>Add</div></div>'}).join('');
+o.innerHTML=h||'<small>No match. Add this medicine in Stock first.</small>'},
+pickCat:function(i){var p=CA()[i].split('|'),x=D.meds.filter(function(z){return z.name.toLowerCase()===p[0].toLowerCase()})[0];if(!x){x={id:uid(),name:p[0],gen:p[1]||'',co:p[2]||'',batch:'',exp:'',cost:0,price:0,qty:0,min:0,sup:'',bar:'',img:null};D.meds.push(x);save()}PH.pickBuy(x.id)},
+pickBuy:function(id){var x=find(id);$('u_med').value=id;$('u_f').value=x.name;$('u_sg').innerHTML='';$('u_sel').innerHTML='<div class="c"><b style="font-size:16px">'+esc(x.name)+'</b>Generic: '+esc(x.gen)+'<br>Company: '+esc(x.co)+'<br>In stock: '+x.qty+'</div>';if(x.cost)$('u_cost').value=x.cost;if(x.price)$('u_price').value=x.price},
+sm:function(){if(ed)return;var q=$('m_name').value.trim().toLowerCase(),o=$('m_sg');if(q.length<1){o.innerHTML='';return}
+o.innerHTML=cs(q).map(function(z){return '<div class="r" onclick="PH.fillCat('+z[1]+')"><div><b>'+esc(z[0][0])+'</b><br><small>'+esc(z[0][1])+' · '+esc(z[0][2])+'</small></div><div>Use</div></div>'}).join('')},
+fillCat:function(i){var p=CA()[i].split('|');$('m_name').value=p[0];$('m_gen').value=p[1]||'';$('m_co').value=p[2]||'';$('m_sg').innerHTML=''},
+imp:function(el){var fl=el.files[0];if(!fl)return;var r=new FileReader();r.onload=function(){var have={},n=0;D.meds.forEach(function(x){have[x.name.toLowerCase()]=1});CA().forEach(function(x){have[x.split('|')[0].toLowerCase()]=1});
+r.result.split(/\r?\n/).forEach(function(l,k){var p=l.split(/\t|,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(function(v){return v.replace(/^\s*"|"\s*$/g,'').replace(/[|;]/g,' ').trim()});
+if(!p[0]||(k===0&&/^(name|brand|product)/i.test(p[0]))||have[p[0].toLowerCase()])return;have[p[0].toLowerCase()]=1;D.cx.push(p[0]+'|'+(p[1]||'')+'|'+(p[2]||''));n++});save();alert(n+' medicines added to the search list.');render()};r.readAsText(fl)},
+clrCx:function(){if(confirm('Remove all imported medicines from the search list? (Your stock is not affected.)')){D.cx=[];save();render()}},
+go:function(t){tab=t;ed=null;pimg=null;render()},
+login:function(){if(val('pin')===D.set.pin){ok=true;render()}else alert('Wrong PIN')},
+list:function(){var q=($('phq').value||'').toLowerCase();$('ml').innerHTML=D.meds.filter(function(x){return (x.name+' '+x.gen).toLowerCase().indexOf(q)>-1}).map(function(x){var d=days(x.exp);return '<div class="r"><div style="display:flex;gap:8px;align-items:center">'+th(x)+'<div><b>'+esc(x.name)+'</b> <small>'+esc(x.gen)+'</small><br><small>'+esc(x.co)+' · Batch '+esc(x.batch)+' · '+m(x.price)+'</small><br><small class="'+(d<0?'red':d<=60?'amb':'')+'">Exp '+esc(x.exp||'-')+(d<0?' (expired)':'')+'</small></div></div><div>'+(x.qty<=x.min?'<span class="amb">':'<span>')+'Qty '+x.qty+'</span><br><button class="s" onclick="PH.edit(\''+x.id+'\')">Edit</button><button class="s d" onclick="PH.del(\''+x.id+'\')">Del</button></div></div>'}).join('')||'<small>No medicines found.</small>'},
+saveMed:function(){if(!val('m_name')){alert('Enter the medicine name');return}
+var o={name:val('m_name'),gen:val('m_gen'),co:val('m_co'),batch:val('m_batch'),exp:val('m_exp'),bar:val('m_bar'),img:pimg,cost:num('m_cost'),price:num('m_price'),qty:num('m_qty'),min:num('m_min'),sup:val('m_sup')};
+if(ed){for(var k in o)ed[k]=o[k]}else{o.id=uid();D.meds.push(o)}ed=null;pimg=null;save();render()},
+edit:function(i){ed=find(i);pimg=ed.img||null;render();window.scrollTo(0,0)},cancel:function(){ed=null;pimg=null;render()},
+del:function(i){if(confirm('Delete this medicine?')){D.meds=D.meds.filter(function(x){return x.id!==i});save();render()}},
+ps:function(){var raw=$('ps').value.trim(),hit=raw&&D.meds.filter(function(x){return x.bar&&x.bar===raw})[0];if(hit){PH.byBar(raw);return}var q=raw.toLowerCase(),r=$('pr');if(!q){r.innerHTML='';return}
+r.innerHTML=D.meds.filter(function(x){return x.qty>0&&days(x.exp)>=0&&(x.name+' '+x.gen).toLowerCase().indexOf(q)>-1}).slice(0,8).map(function(x){return '<div class="r" onclick="PH.add(\''+x.id+'\')"><div style="display:flex;gap:8px;align-items:center">'+th(x)+'<div><b>'+esc(x.name)+'</b><br><small>'+esc(x.gen)+' · in stock '+x.qty+'</small></div></div><div>'+m(x.price)+' ＋</div></div>'}).join('')||'<small>No matching medicine in stock.</small>'},
+add:function(i){var x=find(i),c=cart.filter(function(z){return z.id===i})[0];if(c){if(c.qty<x.qty)c.qty++}else cart.push({id:i,name:x.name,qty:1,price:x.price,cost:x.cost});$('ps').value='';PH.ps();PH.cart()},
+cart:function(){$('ci').innerHTML=cart.map(function(c,n){return '<div class="r"><div><b>'+esc(c.name)+'</b><br><small>'+m(c.price)+' each</small></div><div><input style="width:64px" type="number" value="'+c.qty+'" onchange="PH.q('+n+',this.value)"><button class="s d" onclick="PH.rm('+n+')">✕</button></div></div>'}).join('')||'<small>Cart is empty.</small>';PH.tot()},
+q:function(n,v){var x=find(cart[n].id);v=Math.floor(+v)||1;cart[n].qty=Math.max(1,Math.min(v,x.qty));PH.cart()},
+rm:function(n){cart.splice(n,1);PH.cart()},clr:function(){cart=[];render()},
+tot:function(){var sub=sum(cart,function(c){return c.qty*c.price}),t=Math.max(0,sub-num('pd')),p=$('pp').value===''?t:num('pp');$('tt').textContent='Total: '+m(t);$('ch').textContent=p>=t?'Change: '+m(p-t):'Due (credit): '+m(t-p)},
+sell:function(){if(!cart.length){alert('Cart is empty');return}
+var sub=sum(cart,function(c){return c.qty*c.price}),dc=Math.min(num('pd'),sub),t=sub-dc,p=$('pp').value===''?t:num('pp'),cu=$('pc').value;lastAg=$('pa').value;
+if(p<t&&!cu){alert('Choose a customer to sell on credit, or enter full cash.');return}
+var s={id:uid(),no:D.sales.length+1,date:today(),time:new Date().toLocaleTimeString(),items:cart.map(function(c){return{name:c.name,qty:c.qty,price:c.price}}),sub:sub,disc:dc,total:t,paid:Math.min(p,t),rec:p,cust:cu,agent:$('pa').value,profit:t-sum(cart,function(c){return c.qty*c.cost})};
+cart.forEach(function(c){find(c.id).qty-=c.qty});D.sales.push(s);save();cart=[];PH.receipt(s)},
+receipt:function(s){var r=$('ph-rc'),d=D.set;r.innerHTML='<div class="rc"><div style="max-width:320px;margin:0 auto"><h3 style="text-align:center;margin:0">'+esc(d.name)+'</h3><div style="text-align:center">'+esc(d.addr)+'<br>'+esc(d.phone)+'</div><p>Bill #'+s.no+' · '+s.date+' '+esc(s.time)+'</p><table>'+s.items.map(function(i){return '<tr><td>'+esc(i.name)+'</td><td>'+i.qty+' × '+i.price+'</td><td>'+m(i.qty*i.price)+'</td></tr>'}).join('')+'</table><p>Subtotal: '+m(s.sub)+'<br>Discount: '+m(s.disc)+'<br><b>Total: '+m(s.total)+'</b><br>Paid: '+m(s.rec)+'<br>'+(s.rec>=s.total?'Change: '+m(s.rec-s.total):'Due: '+m(s.total-s.paid))+'</p><p style="text-align:center">'+esc(d.foot)+'</p><div class="np"><button class="b" onclick="window.print()">Print</button><button class="s" onclick="PH.closeRc()">Close</button></div></div></div>'},
+closeRc:function(){$('ph-rc').innerHTML='';render()},
+buy:function(){var q=num('u_qty'),c=num('u_cost'),x=find($('u_med').value),sp=val('u_sup');if(!x||q<=0||!sp){alert('Choose a supplier and medicine, and enter a quantity.');return}
+if(!D.sups.some(function(s){return s.name===sp}))D.sups.push({id:uid(),name:sp,phone:''});
+x.qty+=q;if(c>0)x.cost=c;if(num('u_price')>0)x.price=num('u_price');if(val('u_batch'))x.batch=val('u_batch');if(val('u_exp'))x.exp=val('u_exp');
+D.purch.push({id:uid(),date:today(),sup:sp,inv:val('u_inv'),med:x.name,qty:q,cost:c,paid:$('u_paid').value===''?q*c:num('u_paid')});save();render()},
+addParty:function(k){if(!val('p_name')){alert('Enter a name');return}D[k].push({id:uid(),name:val('p_name'),phone:val('p_phone')});save();render()},
+settle:function(k,i){var x=D[k].filter(function(z){return z.id===i})[0],a=parseFloat(prompt('Amount (owing '+m(bal(k,x))+')'));if(a>0){x.rec=(x.rec||0)+a;save();render()}},
+rep:function(){rf=$('r1').value||rf;rt=$('r2').value||rt;render()},
+rng:function(w){rt=today();rf=w?rt.slice(0,8)+'01':rt;render()},
+saveSet:function(){D.set={name:val('s_name')||'My Pharmacy',addr:val('s_addr'),phone:val('s_phone'),foot:val('s_foot'),pin:val('s_pin')};save();render()},
+bk:function(){dl('pharmacy-backup-'+today()+'.json',JSON.stringify(D),'application/json')},
+csv:function(){var q=function(v){return '"'+String(v==null?'':v).replace(/"/g,'""')+'"'},h=['name','bar','gen','co','batch','exp','cost','price','qty','min','sup'];
+dl('stock-'+today()+'.csv',[h.join(',')].concat(D.meds.map(function(x){return h.map(function(k){return q(x[k])}).join(',')})).join('\n'),'text/csv')},
+rs:function(el){var fl=el.files[0];if(!fl)return;var r=new FileReader();r.onload=function(){try{var o=JSON.parse(r.result);if(!o.meds||!o.sales||!o.set)throw 0;if(confirm('Replace all current data with this backup?')){D=o;norm();save();render()}}catch(e){alert('This is not a valid backup file.')}};r.readAsText(fl)},
+reset:function(){if(confirm('Erase ALL data? Download a backup first.')&&confirm('Really erase everything?')){try{localStorage.removeItem(K)}catch(e){}location.reload()}}
+};
+try{localStorage.setItem('ph_t','1');localStorage.removeItem('ph_t')}catch(e){document.getElementById('ph-app').insertAdjacentHTML('beforebegin','<p style="background:#fbe9e7;color:#b3261e;padding:10px;border-radius:8px">Storage is blocked in this browser, so data will NOT be saved. Open this file in Chrome and allow site data.</p>')}
+try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
+render();
+})();
+</script></div>
+
+<script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})}</script>
+</body></html>
